@@ -8,15 +8,14 @@ import User from "../models/User.js";
 export const registerUser = async (req, res) => {
   try {
     const {
-  name,
-  email,
-  password,
-  college,
-  branch,
-  semester,
-} = req.body;
+      name,
+      email,
+      password,
+      college,
+      branch,
+      semester,
+    } = req.body;
 
-    // Validation
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -24,7 +23,6 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    // Check existing user
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -34,14 +32,15 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    // Hash Password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create User
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
+      college,
+      branch,
+      semester,
     });
 
     res.status(201).json({
@@ -63,16 +62,8 @@ export const registerUser = async (req, res) => {
 // ======================
 export const loginUser = async (req, res) => {
   try {
-    const user = await User.create({
-  name,
-  email,
-  password: hashedPassword,
-  college,
-  branch,
-  semester,
-});
+    const { email, password } = req.body;
 
-    // Validation
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -80,7 +71,6 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    // Find User
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -90,7 +80,6 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    // Compare Password
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -100,7 +89,6 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    // Generate JWT Token
     const token = jwt.sign(
       {
         id: user._id,

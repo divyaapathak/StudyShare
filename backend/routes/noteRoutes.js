@@ -1,23 +1,7 @@
 import express from "express";
 import protect from "../middleware/authMiddleware.js";
 import upload from "../middleware/uploadMiddleware.js";
-import {
-  uploadNote,
-  getAllNotes,
-} from "../controllers/noteController.js";
-import {
-  uploadNote,
-  getAllNotes,
-  getSingleNote,
-  deleteNote,
-} from "../controllers/noteController.js";
-import {
-  uploadNote,
-  getAllNotes,
-  getSingleNote,
-  deleteNote,
-  updateNote,
-} from "../controllers/noteController.js";
+
 import {
   uploadNote,
   getAllNotes,
@@ -26,10 +10,6 @@ import {
   deleteNote,
   searchNotes,
 } from "../controllers/noteController.js";
-
-
-
-
 
 const router = express.Router();
 
@@ -43,7 +23,7 @@ router.post(
 router.get("/", getAllNotes);
 router.get("/search", searchNotes);
 router.get("/:id", getSingleNote);
-router.delete("/:id", protect, deleteNote);
+
 router.put(
   "/:id",
   protect,
@@ -51,5 +31,6 @@ router.put(
   updateNote
 );
 
+router.delete("/:id", protect, deleteNote);
 
 export default router;

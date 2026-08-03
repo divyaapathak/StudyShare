@@ -206,6 +206,7 @@ export const searchNotes = async (req, res) => {
 
     res.status(200).json({
       success: true,
+      
       count: notes.length,
       notes,
     });
