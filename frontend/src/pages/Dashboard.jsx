@@ -1,4 +1,7 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
 import {
   FileText,
   Upload,
@@ -6,37 +9,71 @@ import {
   Heart,
   BookOpen,
   Plus,
+  LogOut,
 } from "lucide-react";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+
+  const [user, setUser] = useState({});
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+
+    if (storedUser) {
+      setUser(storedUser);
+    }
+
+    fetchNotes();
+  }, []);
+
+  const fetchNotes = async () => {
+    try {
+      const { data } = await axios.get(
+        "http://localhost:5000/api/notes"
+      );
+
+      setNotes(data.notes);
+
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    navigate("/login");
+  };
+
   const stats = [
     {
       title: "Total Notes",
-      value: "120",
+      value: notes.length,
       icon: <FileText className="text-blue-600" size={28} />,
     },
     {
       title: "My Uploads",
-      value: "15",
+      value: notes.filter(
+        (note) => note.uploadedBy?._id === user?._id
+      ).length,
       icon: <Upload className="text-green-600" size={28} />,
     },
     {
       title: "Downloads",
-      value: "320",
+      value: 0,
       icon: <Download className="text-purple-600" size={28} />,
     },
     {
       title: "Favorites",
-      value: "8",
+      value: 0,
       icon: <Heart className="text-red-500" size={28} />,
     },
-  ];
-
-  const uploads = [
-    "DBMS Notes.pdf",
-    "Operating System.pdf",
-    "Computer Networks.pdf",
-    "Java Programming.pdf",
   ];
 
   const subjects = [
@@ -47,22 +84,33 @@ export default function Dashboard() {
     "DSA",
     "AI",
   ];
-
-  return (
+    return (
     <div className="min-h-screen bg-slate-100 p-6">
 
       <div className="max-w-7xl mx-auto">
 
-        {/* Heading */}
+        {/* Header */}
 
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-800">
-            Welcome 👋
-          </h1>
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8">
 
-          <p className="text-gray-500 mt-2">
-            Manage your notes and track your activity.
-          </p>
+          <div>
+            <h1 className="text-4xl font-bold text-slate-800">
+              Welcome 👋 {user?.name}
+            </h1>
+
+            <p className="text-gray-500 mt-2">
+              Manage your notes and track your activity.
+            </p>
+          </div>
+
+          <button
+            onClick={logout}
+            className="mt-4 md:mt-0 flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded-xl transition"
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
+
         </div>
 
         {/* Stats */}
@@ -75,8 +123,11 @@ export default function Dashboard() {
               className="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition"
             >
               <div className="flex justify-between items-center">
+
                 <div>
-                  <p className="text-gray-500">{item.title}</p>
+                  <p className="text-gray-500">
+                    {item.title}
+                  </p>
 
                   <h2 className="text-3xl font-bold mt-2">
                     {item.value}
@@ -84,6 +135,7 @@ export default function Dashboard() {
                 </div>
 
                 {item.icon}
+
               </div>
             </div>
           ))}
@@ -120,38 +172,64 @@ export default function Dashboard() {
 
         </div>
 
-        {/* Two Column Layout */}
+        {/* Two Columns */}
 
         <div className="grid lg:grid-cols-2 gap-8 mt-8">
 
-          {/* Recent Uploads */}
+          {/* Recent Notes */}
 
           <div className="bg-white rounded-2xl shadow-md p-6">
 
             <h2 className="text-2xl font-semibold mb-5">
-              Recent Uploads
+              Recent Notes
             </h2>
 
             <div className="space-y-4">
 
-              {uploads.map((note, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center border rounded-xl p-4 hover:bg-slate-50"
-                >
-                  <span>{note}</span>
+              {loading ? (
 
-                  <span className="text-blue-600 font-medium">
-                    PDF
-                  </span>
-                </div>
-              ))}
+                <p>Loading...</p>
+
+              ) : notes.length === 0 ? (
+
+                <p>No Notes Found</p>
+
+              ) : (
+
+                notes.slice(0, 5).map((note) => (
+
+                  <div
+                    key={note._id}
+                    className="flex justify-between items-center border rounded-xl p-4 hover:bg-slate-50"
+                  >
+
+                    <div>
+
+                      <h3 className="font-semibold">
+                        {note.title}
+                      </h3>
+
+                      <p className="text-sm text-gray-500">
+                        {note.subject}
+                      </p>
+
+                    </div>
+
+                    <span className="text-blue-600 font-medium">
+                      PDF
+                    </span>
+
+                  </div>
+
+                ))
+
+              )}
 
             </div>
 
           </div>
 
-          {/* Popular Subjects */}
+          {/* Subjects */}
 
           <div className="bg-white rounded-2xl shadow-md p-6">
 
@@ -162,12 +240,14 @@ export default function Dashboard() {
             <div className="flex flex-wrap gap-3">
 
               {subjects.map((subject, index) => (
+
                 <span
                   key={index}
                   className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full"
                 >
                   {subject}
                 </span>
+
               ))}
 
             </div>
