@@ -7,7 +7,14 @@ import User from "../models/User.js";
 // ======================
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const {
+  name,
+  email,
+  password,
+  college,
+  branch,
+  semester,
+} = req.body;
 
     // Validation
     if (!name || !email || !password) {
@@ -56,7 +63,14 @@ export const registerUser = async (req, res) => {
 // ======================
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const user = await User.create({
+  name,
+  email,
+  password: hashedPassword,
+  college,
+  branch,
+  semester,
+});
 
     // Validation
     if (!email || !password) {
