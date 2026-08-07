@@ -1,185 +1,108 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  BookOpen,
-} from "lucide-react";
+import { Eye, EyeOff, BookOpen } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
 
-  // API URL (.env)
-  const API = import.meta.env.VITE_API_URL;
-
   const [showPassword, setShowPassword] = useState(false);
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validation
-    if (!email.trim() || !password.trim()) {
-      return alert("Please fill all fields");
-    }
 
     try {
       setLoading(true);
 
       const { data } = await axios.post(
-        `${API}/auth/login`,
-        {
-          email: email.trim(),
-          password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          timeout: 10000,
-        }
+        "http://localhost:5000/api/auth/login",
+        formData
       );
 
-      // Save Token
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-      // Save User
-      localStorage.setItem(
-        "user",
-        JSON.stringify(data.user)
-      );
-
-      alert(data.message || "Login Successful");
-
+      alert(data.message);
       navigate("/dashboard");
 
-    } catch (error) {
-      console.error(error);
-
-      if (error.response) {
-        alert(error.response.data.message);
-      } else if (error.request) {
-        alert("Cannot connect to server.");
-      } else {
-        alert("Something went wrong.");
-      }
-
+    } catch (err) {
+      alert(err.response?.data?.message || "Login Failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8">
+    <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
 
-        {/* Logo */}
         <div className="flex justify-center mb-5">
           <div className="bg-blue-100 p-4 rounded-full">
-            <BookOpen
-              size={40}
-              className="text-blue-600"
-            />
+            <BookOpen className="text-blue-600" size={35} />
           </div>
         </div>
 
-        <h1 className="text-3xl font-bold text-center text-slate-800">
+        <h1 className="text-3xl font-bold text-center">
           Welcome Back
         </h1>
 
-        <p className="text-center text-gray-500 mt-2">
+        <p className="text-center text-gray-500 mt-2 mb-6">
           Login to your StudyShare account
         </p>
 
-        <form
-          onSubmit={handleSubmit}
-          className="mt-8 space-y-5"
-        ></form>
-                  {/* Email */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+
+          <input
+            type="email"
+            name="email"
+            placeholder="Email Address"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            className="w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+
           <div className="relative">
-            <Mail
-              className="absolute left-4 top-4 text-gray-400"
-              size={20}
-            />
-
-            <input
-              type="email"
-              placeholder="Email Address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              required
-              className="w-full border border-gray-300 rounded-xl pl-12 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-            />
-          </div>
-
-          {/* Password */}
-          <div className="relative">
-            <Lock
-              className="absolute left-4 top-4 text-gray-400"
-              size={20}
-            />
-
             <input
               type={showPassword ? "text" : "password"}
+              name="password"
               placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
+              value={formData.password}
+              onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-xl pl-12 pr-12 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              className="w-full border rounded-lg px-4 py-3 pr-12 focus:ring-2 focus:ring-blue-500 outline-none"
             />
 
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-3 text-gray-500 hover:text-blue-600 transition"
+              className="absolute right-4 top-3 text-gray-500"
             >
-              {showPassword ? (
-                <EyeOff size={20} />
-              ) : (
-                <Eye size={20} />
-              )}
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
 
-          {/* Remember + Forgot */}
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2 text-gray-600">
-              <input
-                type="checkbox"
-                className="rounded"
-              />
-              Remember Me
-            </label>
-
-            <Link
-              to="/forgot-password"
-              className="text-blue-600 hover:underline"
-            >
-              Forgot Password?
-            </Link>
-          </div>
-
-          {/* Login Button */}
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 rounded-xl font-semibold text-white transition ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            }`}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
+
         </form>
 
         <p className="text-center mt-6 text-gray-600">
@@ -191,6 +114,7 @@ export default function Login() {
             Register
           </Link>
         </p>
+
       </div>
     </div>
   );
