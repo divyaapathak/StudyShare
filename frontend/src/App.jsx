@@ -6,6 +6,8 @@ import Upload from "./pages/Upload";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import BrowseNotes from "./pages/BrowseNotes";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 
 
 function App() {
@@ -18,7 +20,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
       <Route path="/login" element={<Login />} />
       <Route path="/notes" element={<BrowseNotes />} />
-
+ <Route path="/protectedroute" element={<ProtectedRoute />} />
     </Routes>
   );
 }
