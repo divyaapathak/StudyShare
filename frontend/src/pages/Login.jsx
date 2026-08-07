@@ -27,10 +27,8 @@ export default function Login() {
         }
       );
 
-      // Save Token
+    
       localStorage.setItem("token", data.token);
-
-      // Save User
       localStorage.setItem("user", JSON.stringify(data.user));
 
       alert(data.message);
