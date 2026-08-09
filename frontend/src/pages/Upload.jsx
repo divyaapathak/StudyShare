@@ -169,7 +169,21 @@ export default function Upload() {
             </select>
           </div>
 
-        
+          <div>
+            <label className="block mb-2 font-medium">
+              Description
+            </label>
+
+            <textarea
+              rows="4"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Write a short description..."
+              className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
           <div>
             <label className="block mb-2 font-medium">
               Upload PDF
