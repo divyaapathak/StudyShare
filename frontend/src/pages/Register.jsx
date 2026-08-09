@@ -1,3 +1,4 @@
+```jsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -51,34 +52,37 @@ export default function Register() {
         }
       );
 
-      alert(data.message);
+      alert(data.message || "Registration successful");
 
       navigate("/login");
-    }  catch (error) {
-  console.error("REGISTER ERROR:", error);
-  console.error("SERVER RESPONSE:", error.response?.data);
+    } catch (error) {
+      console.error("REGISTER ERROR:", error);
+      console.error("SERVER RESPONSE:", error.response?.data);
 
-  alert(
-    error.response?.data?.message ||
-    error.message ||
-    "Registration Failed"
-  );
-} finally {
-  setLoading(false);
-}
+      alert(
+        error.response?.data?.message ||
+          error.message ||
+          "Registration Failed"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4 py-10">
+
       <motion.div
         initial={{ opacity: 0, y: 25 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         className="bg-white w-full max-w-lg rounded-2xl shadow-lg p-8"
       >
+
         {/* Logo */}
         <div className="flex justify-center">
-          <div className="bg-blue-600 p-3 rounded-full">
-            <BookOpen className="text-white" size={28} />
+          <div className="bg-blue-600 p-3 rounded-xl">
+            <BookOpen className="text-white" size={30} />
           </div>
         </div>
 
@@ -90,7 +94,10 @@ export default function Register() {
           Join StudyShare and start sharing notes.
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+        <form
+          onSubmit={handleSubmit}
+          className="mt-8 space-y-5"
+        >
 
           {/* Full Name */}
           <div>
@@ -192,6 +199,7 @@ export default function Register() {
             </label>
 
             <div className="relative">
+
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
@@ -213,6 +221,7 @@ export default function Register() {
                   <Eye size={20} />
                 )}
               </button>
+
             </div>
           </div>
 
@@ -223,6 +232,7 @@ export default function Register() {
             </label>
 
             <div className="relative">
+
               <input
                 type={showConfirm ? "text" : "password"}
                 name="confirmPassword"
@@ -244,6 +254,7 @@ export default function Register() {
                   <Eye size={20} />
                 )}
               </button>
+
             </div>
           </div>
 
@@ -260,6 +271,7 @@ export default function Register() {
 
         <p className="text-center mt-6 text-gray-600">
           Already have an account?{" "}
+
           <Link
             to="/login"
             className="text-blue-600 font-semibold hover:underline"
@@ -267,7 +279,9 @@ export default function Register() {
             Login
           </Link>
         </p>
+
       </motion.div>
     </div>
   );
 }
+```
