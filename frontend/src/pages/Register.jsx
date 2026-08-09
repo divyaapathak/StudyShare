@@ -54,12 +54,18 @@ export default function Register() {
       alert(data.message);
 
       navigate("/login");
-    } catch (error) {
-      alert(error.response?.data?.message || "Registration Failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+    }  catch (error) {
+  console.error("REGISTER ERROR:", error);
+  console.error("SERVER RESPONSE:", error.response?.data);
+
+  alert(
+    error.response?.data?.message ||
+    error.message ||
+    "Registration Failed"
+  );
+} finally {
+  setLoading(false);
+}
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4 py-10">
