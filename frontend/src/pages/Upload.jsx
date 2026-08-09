@@ -62,18 +62,15 @@ export default function Upload() {
 
       navigate("/dashboard");
 
-    }  catch (error) {
-  console.log("UPLOAD ERROR:", error);
-  console.log("SERVER RESPONSE:", error.response?.data);
+    } catch (error) {
+      alert(
+        error.response?.data?.message || "Upload Failed"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  alert(
-    error.response?.data?.message ||
-    error.message ||
-    "Upload Failed"
-  );
-} finally {
-  setLoading(false);
-}
   return (
     <div className="min-h-screen bg-slate-100 py-12 px-4">
 
