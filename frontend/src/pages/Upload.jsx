@@ -1,4 +1,3 @@
-```jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -14,6 +13,7 @@ export default function Upload() {
     subject: "",
     semester: "",
     branch: "",
+    
   });
 
   const [file, setFile] = useState(null);
@@ -23,31 +23,6 @@ export default function Upload() {
       ...formData,
       [e.target.name]: e.target.value,
     });
-  };
-
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-
-    if (!selectedFile) {
-      setFile(null);
-      return;
-    }
-
-    if (selectedFile.type !== "application/pdf") {
-      alert("Only PDF files are allowed");
-      e.target.value = "";
-      setFile(null);
-      return;
-    }
-
-    if (selectedFile.size > 10 * 1024 * 1024) {
-      alert("PDF size must be less than 10MB");
-      e.target.value = "";
-      setFile(null);
-      return;
-    }
-
-    setFile(selectedFile);
   };
 
   const handleSubmit = async (e) => {
@@ -63,18 +38,13 @@ export default function Upload() {
 
       const token = localStorage.getItem("token");
 
-      if (!token) {
-        alert("Please login first");
-        navigate("/login");
-        return;
-      }
-
       const uploadData = new FormData();
 
       uploadData.append("title", formData.title);
       uploadData.append("subject", formData.subject);
       uploadData.append("semester", formData.semester);
       uploadData.append("branch", formData.branch);
+  
       uploadData.append("file", file);
 
       const { data } = await axios.post(
@@ -83,29 +53,30 @@ export default function Upload() {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
           },
         }
       );
 
-      alert(data.message || "Note uploaded successfully");
+      alert(data.message);
 
       navigate("/dashboard");
-    } catch (error) {
-      console.error("UPLOAD ERROR:", error);
-      console.error("SERVER RESPONSE:", error.response?.data);
 
-      alert(
-        error.response?.data?.message ||
-          error.message ||
-          "Upload Failed"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    }  catch (error) {
+  console.log("UPLOAD ERROR:", error);
+  console.log("SERVER RESPONSE:", error.response?.data);
 
+  alert(
+    error.response?.data?.message ||
+    error.message ||
+    "Upload Failed"
+  );
+} finally {
+  setLoading(false);
+}
   return (
-    <div className="min-h-screen bg-slate-100 py-10 px-4">
+    <div className="min-h-screen bg-slate-100 py-12 px-4">
+
       <div className="max-w-2xl mx-auto bg-white shadow-xl rounded-2xl p-8">
 
         <h1 className="text-3xl font-bold text-center text-slate-800">
@@ -121,7 +92,6 @@ export default function Upload() {
           className="mt-8 space-y-5"
         >
 
-          {/* Title */}
           <div>
             <label className="block mb-2 font-medium">
               Notes Title
@@ -138,7 +108,6 @@ export default function Upload() {
             />
           </div>
 
-          {/* Subject */}
           <div>
             <label className="block mb-2 font-medium">
               Subject
@@ -161,7 +130,6 @@ export default function Upload() {
             </select>
           </div>
 
-          {/* Branch */}
           <div>
             <label className="block mb-2 font-medium">
               Branch
@@ -177,9 +145,7 @@ export default function Upload() {
               required
             />
           </div>
-
-          {/* Semester */}
-          <div>
+                    <div>
             <label className="block mb-2 font-medium">
               Semester
             </label>
@@ -203,7 +169,21 @@ export default function Upload() {
             </select>
           </div>
 
-          {/* PDF Upload */}
+          <div>
+            <label className="block mb-2 font-medium">
+              Description
+            </label>
+
+            <textarea
+              rows="4"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Write a short description..."
+              className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
           <div>
             <label className="block mb-2 font-medium">
               Upload PDF
@@ -216,26 +196,21 @@ export default function Upload() {
                 size={32}
               />
 
-              <span className="text-gray-600 text-center">
+              <span>
                 {file ? file.name : "Choose PDF File"}
               </span>
 
               <input
                 type="file"
-                accept="application/pdf,.pdf"
+                accept=".pdf"
                 hidden
-                onChange={handleFileChange}
+                onChange={(e) => setFile(e.target.files[0])}
                 required
               />
 
             </label>
-
-            <p className="text-sm text-gray-500 mt-2">
-              PDF only • Maximum size: 10MB
-            </p>
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
@@ -247,7 +222,7 @@ export default function Upload() {
         </form>
 
       </div>
+
     </div>
   );
 }
-```
