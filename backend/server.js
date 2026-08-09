@@ -1,28 +1,41 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+
 import connectDB from "./config/db.js";
+import authRoutes from "./routes/authRoutes.js";
 import noteRoutes from "./routes/noteRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
-
 dotenv.config();
-
-connectDB();
 
 const app = express();
 
-app.use(cors());
+// Database
+connectDB();
+
+// CORS
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
+
+// Body parser
 app.use(express.json());
-import authRoutes from "./routes/authRoutes.js";
+
+// Test route
 app.get("/", (req, res) => {
   res.send("StudyShare Backend Running");
 });
+
+// API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", noteRoutes);
 app.use("/api/users", userRoutes);
 
-
+// Server
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
