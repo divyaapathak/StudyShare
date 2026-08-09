@@ -1,8 +1,7 @@
-
+```jsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import axios from "axios";
 import { BookOpen, Eye, EyeOff } from "lucide-react";
 
 export default function Register() {
@@ -23,14 +22,23 @@ export default function Register() {
   });
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.password
+    ) {
+      alert("Please fill all required fields");
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match");
@@ -40,29 +48,54 @@ export default function Register() {
     try {
       setLoading(true);
 
-      const { data } = await axios.post(
+      const response = await fetch(
         "http://localhost:5000/api/auth/register",
         {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          college: formData.college,
-          branch: formData.branch,
-          semester: formData.semester,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            college: formData.college,
+            branch: formData.branch,
+            semester: formData.semester,
+          }),
         }
       );
 
-      alert(data.message || "Registration successful");
+      const data = await response.json();
+
+      console.log("REGISTER RESPONSE:", data);
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Registration Failed"
+        );
+      }
+
+      alert(
+        data.message || "Registration Successful"
+      );
+
+      setFormData({
+        name: "",
+        email: "",
+        college: "",
+        branch: "",
+        semester: "",
+        password: "",
+        confirmPassword: "",
+      });
 
       navigate("/login");
     } catch (error) {
       console.error("REGISTER ERROR:", error);
-      console.error("SERVER RESPONSE:", error.response?.data);
 
       alert(
-        error.response?.data?.message ||
-          error.message ||
-          "Registration Failed"
+        error.message || "Registration Failed"
       );
     } finally {
       setLoading(false);
@@ -82,10 +115,14 @@ export default function Register() {
         {/* Logo */}
         <div className="flex justify-center">
           <div className="bg-blue-600 p-3 rounded-xl">
-            <BookOpen className="text-white" size={30} />
+            <BookOpen
+              className="text-white"
+              size={30}
+            />
           </div>
         </div>
 
+        {/* Heading */}
         <h2 className="text-3xl font-bold text-center mt-5">
           Create Account
         </h2>
@@ -149,9 +186,10 @@ export default function Register() {
             />
           </div>
 
-          {/* Branch + Semester */}
+          {/* Branch and Semester */}
           <div className="grid md:grid-cols-2 gap-4">
 
+            {/* Branch */}
             <div>
               <label className="block mb-2 font-medium">
                 Branch
@@ -167,6 +205,7 @@ export default function Register() {
               />
             </div>
 
+            {/* Semester */}
             <div>
               <label className="block mb-2 font-medium">
                 Semester
@@ -178,7 +217,10 @@ export default function Register() {
                 onChange={handleChange}
                 className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">Select</option>
+                <option value="">
+                  Select
+                </option>
+
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -201,7 +243,11 @@ export default function Register() {
             <div className="relative">
 
               <input
-                type={showPassword ? "text" : "password"}
+                type={
+                  showPassword
+                    ? "text"
+                    : "password"
+                }
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
@@ -213,7 +259,11 @@ export default function Register() {
               <button
                 type="button"
                 className="absolute right-4 top-3.5 text-gray-500"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() =>
+                  setShowPassword(
+                    !showPassword
+                  )
+                }
               >
                 {showPassword ? (
                   <EyeOff size={20} />
@@ -234,7 +284,11 @@ export default function Register() {
             <div className="relative">
 
               <input
-                type={showConfirm ? "text" : "password"}
+                type={
+                  showConfirm
+                    ? "text"
+                    : "password"
+                }
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
@@ -246,7 +300,11 @@ export default function Register() {
               <button
                 type="button"
                 className="absolute right-4 top-3.5 text-gray-500"
-                onClick={() => setShowConfirm(!showConfirm)}
+                onClick={() =>
+                  setShowConfirm(
+                    !showConfirm
+                  )
+                }
               >
                 {showConfirm ? (
                   <EyeOff size={20} />
@@ -264,11 +322,14 @@ export default function Register() {
             disabled={loading}
             className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition disabled:bg-gray-400"
           >
-            {loading ? "Creating Account..." : "Register"}
+            {loading
+              ? "Creating Account..."
+              : "Register"}
           </button>
 
         </form>
 
+        {/* Login Link */}
         <p className="text-center mt-6 text-gray-600">
           Already have an account?{" "}
 
@@ -284,4 +345,4 @@ export default function Register() {
     </div>
   );
 }
-
+```
