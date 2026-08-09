@@ -1,3 +1,4 @@
+
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -17,20 +18,24 @@ connectDB();
 // CORS
 app.use(
   cors({
-    origin: true,
-    credentials: true,
+    origin: [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-// Body parser
+// JSON
 app.use(express.json());
 
-// Test route
+// Test
 app.get("/", (req, res) => {
   res.send("StudyShare Backend Running");
 });
 
-// API routes
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", noteRoutes);
 app.use("/api/users", userRoutes);
