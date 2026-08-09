@@ -49,7 +49,7 @@ export default function Register() {
       setLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/auth/register",
+        "http://127.0.0.1:5000/api/auth/register"
         {
           method: "POST",
           headers: {
